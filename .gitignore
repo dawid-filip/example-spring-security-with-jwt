@@ -1,4 +1,12 @@
 # Compiled class file
+target/
+.settings/
+
+.classpath
+.factorypath
+.project
+target/classes/META-INF/maven/com.pl.df/CommonUtilities/
+
 *.class
 
 # Log file
