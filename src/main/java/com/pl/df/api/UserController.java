@@ -34,6 +34,11 @@ public class UserController {
 		return ResponseEntity.ok().body(userService.getUsers());
 	}
 	
+	// http://localhost:8088/api/roles
+	@GetMapping("/roles")
+	public ResponseEntity<List<Role>> getRoles() {								// additional method
+		return ResponseEntity.ok().body(roleRepo.findAll());
+	}
 	// http://localhost:8088/api/users/{id}
 	@GetMapping("/users/{id}")
 	public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {	// additional method
@@ -44,8 +49,7 @@ public class UserController {
 	public ResponseEntity<Role> getRoleById(@PathVariable("id") Long id) {	// additional method
 		return ResponseEntity.ok().body(roleRepo.getById(id));
 	}
-
-
+	
 	// http://localhost:8088/api/users
 	@PostMapping("/users")
 	public ResponseEntity<User> saveUser(@RequestBody User user) {
