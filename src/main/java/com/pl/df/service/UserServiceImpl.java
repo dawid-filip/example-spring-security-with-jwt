@@ -25,13 +25,13 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public User saveUser(User user) {
-		log.info("saveUser: " + user);
+		log.info("saveUser: " + user.getUsername());
 		return userRepo.save(user);
 	}
 
 	@Override
 	public Role saveRole(Role role) {
-		log.info("saveRole: " + role);
+		log.info("saveRole: " + role.getName());
 		return roleRepo.save(role);
 	}
 
@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
 		
 		user.getRoles().add(role);	// @Transactional will take care of saving everything into db 
 		
-		log.info("addRoleToUser: " + role + ", " + user);
+		log.info("addRoleToUser: " + roleName + " to user " + username);
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<User> getUsers() {
-		log.info("getUsers ");
+		log.info("getUsers");
 		return userRepo.findAll();
 	}
 
