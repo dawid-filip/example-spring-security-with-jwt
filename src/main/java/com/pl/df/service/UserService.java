@@ -11,4 +11,7 @@ public interface UserService {
 	void addRoleToUser(String username, String roleName); 	// assumption: no duplicates 
 	User getUser(String username);
 	List<User> getUsers();									// usually only for tests, no prod case
+	
+	User getUserById(long id);			// additional method
+	Role getRoleById(long id); 	// additional method
 }

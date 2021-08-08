@@ -56,5 +56,18 @@ public class UserServiceImpl implements UserService {
 		log.info("getUsers");
 		return userRepo.findAll();
 	}
+	
+	
+	
+	@Override
+	public User getUserById(long id) {	// additional method
+		log.info("getUserById: " + id);
+		return userRepo.getById(id);
+	}
+	@Override
+	public Role getRoleById(long id) {	// additional method
+		log.info("getRoleById: " + id);
+		return roleRepo.getById(id);
+	}
 
 }
