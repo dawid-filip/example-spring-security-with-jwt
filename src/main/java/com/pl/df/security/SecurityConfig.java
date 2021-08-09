@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
-	private final UserDetailsService userDetailsService;	// <- this + @RequiredArgsConstructor = DependencyInjection
+	private final UserDetailsService userDetailsService;	// <- final.this + @RequiredArgsConstructor = DependencyInjection
 	private final BCryptPasswordEncoder bCryptPasswordEncoder; 
 	
 	@Override
