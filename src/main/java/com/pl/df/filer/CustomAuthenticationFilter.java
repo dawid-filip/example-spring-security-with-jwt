@@ -22,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pl.df.JwtUtility;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -47,7 +48,8 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication athentication) throws IOException, ServletException {
 		User user = (User)athentication.getPrincipal();
-		Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());	// for sign json web tocket and refresh tocket; secret shuld be somewhere secured and encrypted
+		Algorithm algorithm = JwtUtility.getAlgorithm();
+//		Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());	// for sign json web tocket and refresh tocket; secret shuld be somewhere secured and encrypted
 		
 		String access_token = JWT.create()
 				.withSubject(user.getUsername())	// unique identyfier for user; in this case username will be unique
