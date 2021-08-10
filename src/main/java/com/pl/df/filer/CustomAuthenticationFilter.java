@@ -2,6 +2,8 @@ package com.pl.df.filer;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.FilterChain;
@@ -19,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -26,7 +29,9 @@ import lombok.extern.log4j.Log4j2;
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
 	private final AuthenticationManager authenticationManager; // calling to authenticate user
+	
 	public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
+		//setFilterProcessesUrl("/api/login"); override default login path
 		this.authenticationManager = authenticationManager;
 	}
 	
@@ -64,6 +69,15 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 		response.setHeader("access_token", access_token);
 		response.setHeader("refresh_token", refresh_token);
 		
+		Map<String, String> tokens = new HashMap<>();
+		tokens.put("access_token", access_token);
+		tokens.put("refresh_token", refresh_token);
+		response.setContentType("application/json");
+		new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+		
+		// OR
+		//response.getWriter().write("access_token=" + access_token + "\n");
+		//response.getWriter().write("refresh_token=" + refresh_token + "\n");
 	}
 	
 
