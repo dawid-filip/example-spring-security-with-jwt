@@ -45,6 +45,9 @@ public class DataInitializer implements CommandLineRunner {
 		userService.addRoleToUser("george", "ROLE_MANAGER");
 		userService.addRoleToUser("george", "ROLE_USER");
 		log.info("Added roles to users.");
+		
+		log.info("Users in DB are:");
+		userService.getUsers().forEach(user -> log.info(user.toString()));
 	}
 	
 }
