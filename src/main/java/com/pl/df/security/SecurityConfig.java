@@ -38,6 +38,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		
 		http.csrf().disable();
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+ 		
+		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/token/refresh/**").permitAll(); // also added in Filter
 		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/login/**").permitAll();
 		//http.authorizeRequests().antMatchers(HttpMethod.GET, "/login").permitAll(); // not secured; must be placed before more restricted; this is already handling by spring
 		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority("ROLE_USER");

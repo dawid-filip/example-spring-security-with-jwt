@@ -13,6 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,7 +35,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 	// intercept every request which goes into application
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-		if (request.getServletPath().equals("/api/login")) {
+		if (request.getServletPath().equals("/api/login") || request.getServletPath().equals("/api/token/refresh")) {
 			log.info("/api/login doFilter(request, response)...");
 			filterChain.doFilter(request, response);
 		} else {
@@ -72,7 +73,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 					
 					Map<String, String> errors = new HashMap<>();
 					errors.put("error_message", errorMessage);
-					response.setContentType("application/json");
+					response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 					new ObjectMapper().writeValue(response.getOutputStream(), errors);
 				}
 			} else {

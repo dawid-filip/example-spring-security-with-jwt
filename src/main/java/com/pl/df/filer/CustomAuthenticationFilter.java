@@ -11,6 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -74,7 +75,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 		Map<String, String> tokens = new HashMap<>();
 		tokens.put("access_token", access_token);
 		tokens.put("refresh_token", refresh_token);
-		response.setContentType("application/json");
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		new ObjectMapper().writeValue(response.getOutputStream(), tokens);
 		
 		// OR
