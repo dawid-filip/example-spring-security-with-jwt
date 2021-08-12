@@ -3,6 +3,7 @@ package com.pl.df.filer;
 import java.io.IOException;
 import java.sql.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -49,32 +50,40 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication athentication) throws IOException, ServletException {
 		User user = (User)athentication.getPrincipal();
-		Algorithm algorithm = JwtUtility.getAlgorithm();
+		
+		List<String> roles = user.getAuthorities().stream()
+				.map(GrantedAuthority::getAuthority)
+				.collect(Collectors.toList());
+		
+		Map<String, String> tokens = JwtUtility.getTokens(user.getUsername(), request.getRequestURI().toString(), roles);
+		
+		
+//		Algorithm algorithm = JwtUtility.getAlgorithm();
 //		Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());	// for sign json web tocket and refresh tocket; secret shuld be somewhere secured and encrypted
 		
-		String access_token = JWT.create()
-				.withSubject(user.getUsername())	// unique identyfier for user; in this case username will be unique
-				.withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
-				.withIssuer(request.getRequestURI().toString())  // any string (like organization)
-				.withClaim("roles", user.getAuthorities().stream()
-										.map(GrantedAuthority::getAuthority)
-										.collect(Collectors.toList())
-					)
-				.sign(algorithm);
+//		String access_token = JWT.create()
+//				.withSubject(user.getUsername())	// unique identyfier for user; in this case username will be unique
+//				.withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+//				.withIssuer(request.getRequestURI().toString())  // any string (like organization)
+//				.withClaim("roles", user.getAuthorities().stream()
+//										.map(GrantedAuthority::getAuthority)
+//										.collect(Collectors.toList())
+//					)
+//				.sign(algorithm);
+//		
+//		
+//		String refresh_token = JWT.create()
+//				.withSubject(user.getUsername())	// unique identyfier for user; in this case username will be unique
+//				.withExpiresAt(new Date(System.currentTimeMillis() + 30 * 60 * 1000)) // more time like week, month etc.
+//				.withIssuer(request.getRequestURI().toString())  // any string (like organization)
+//				.sign(algorithm);
 		
-		
-		String refresh_token = JWT.create()
-				.withSubject(user.getUsername())	// unique identyfier for user; in this case username will be unique
-				.withExpiresAt(new Date(System.currentTimeMillis() + 30 * 60 * 1000)) // more time like week, month etc.
-				.withIssuer(request.getRequestURI().toString())  // any string (like organization)
-				.sign(algorithm);
-		
-		response.setHeader("access_token", access_token);
-		response.setHeader("refresh_token", refresh_token);
-		
-		Map<String, String> tokens = new HashMap<>();
-		tokens.put("access_token", access_token);
-		tokens.put("refresh_token", refresh_token);
+//		response.setHeader("access_token", access_token);
+//		response.setHeader("refresh_token", refresh_token);
+//		
+//		Map<String, String> tokens = new HashMap<>();
+//		tokens.put("access_token", access_token);
+//		tokens.put("refresh_token", refresh_token);
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		new ObjectMapper().writeValue(response.getOutputStream(), tokens);
 		

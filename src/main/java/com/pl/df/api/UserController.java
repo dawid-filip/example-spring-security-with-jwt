@@ -3,6 +3,7 @@ package com.pl.df.api;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.Date;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pl.df.JwtUtility;
 import com.pl.df.dto.RoleToUserForm;
@@ -54,7 +57,7 @@ public class UserController {
 	
 	// http://localhost:8088/api/roles
 	@GetMapping("/roles")
-	public ResponseEntity<List<Role>> getRoles() {								// additional method
+	public ResponseEntity<List<Role>> getRoles() {							// additional method
 		return ResponseEntity.ok().body(roleRepo.findAll());
 	}
 	// http://localhost:8088/api/users/{id}
@@ -89,7 +92,6 @@ public class UserController {
 		return ResponseEntity.ok().build();
 	}
 	
-	
 	private final String BEARER = "Bearer ";
 	
 	// http://localhost:8088/api/token/refresh
@@ -106,23 +108,31 @@ public class UserController {
 				String username = decodedJWT.getSubject(); 
 				User user = userService.getUser(username);
 				
-				String access_token = JWT.create()
-						.withSubject(user.getUsername())	// unique identyfier for user; in this case username will be unique
-						.withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
-						.withIssuer(request.getRequestURI().toString())  // any string (like organization)
-						.withClaim("roles", user.getRoles().stream()
-												.map(Role::getName)
-												.collect(Collectors.toList())
-							)
-						.sign(JwtUtility.getAlgorithm());
+				List<String> roles = user.getRoles().stream()
+						.map(Role::getName)
+						.collect(Collectors.toList());
+				
+				Map<String, String> tokens = JwtUtility.getTokens(user.getUsername(), request.getRequestURI().toString(), roles);
+				
+//				String access_token = JWT.create()
+//						.withSubject(user.getUsername())	// unique identyfier for user; in this case username will be unique
+//						.withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+//						.withIssuer(request.getRequestURI().toString())  // any string (like organization)
+//						.withClaim("roles", user.getRoles().stream()
+//												.map(Role::getName)
+//												.collect(Collectors.toList())
+//							)
+//						.sign(JwtUtility.getAlgorithm());
 				//String refresh_token = JWT.create().. // do not need, can return the same refresh token
 				
-				response.setHeader("access_token", access_token);
-				response.setHeader("refresh_token", refresh_token);
+				response.setHeader("access_token", tokens.get("access_token"));
+				response.setHeader("refresh_token", refresh_token); //tokens.get("refresh_token");
 				
-				Map<String, String> tokens = new HashMap<>();
-				tokens.put("access_token", access_token);
-				tokens.put("refresh_token", refresh_token);
+//				Map<String, String> tokens = new HashMap<>();
+//				tokens.put("access_token", access_token);
+//				tokens.put("refresh_token", refresh_token);
+				
+				tokens.putIfAbsent("refresh_token", refresh_token);
 				response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 				new ObjectMapper().writeValue(response.getOutputStream(), tokens);
 				
