@@ -1,6 +1,7 @@
 package com.pl.df.filer;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,8 +27,11 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-
+	
 	private final AuthenticationManager authenticationManager; // calling to authenticate user
+	
+	
+	private HashMap<String, Integer> usersFailureAttepmts = new HashMap<>();
 	
 	public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
 		//setFilterProcessesUrl("/api/login"); override default login path
@@ -40,6 +44,12 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 		String password = request.getParameter("password");
 		log.info("Username is: {}, Password is: {}.", username, password);
 		UsernamePasswordAuthenticationToken authenticationToke = new UsernamePasswordAuthenticationToken(username, password);
+		
+//		boolean isAuthenticated = authenticationToke.isAuthenticated();
+//		if (!isAuthenticated) {
+//			throw new AuthenticationCredentialsNotFoundException("Incorrect username or password.");
+//		}
+		
 		return authenticationManager.authenticate(authenticationToke);
 	}
 
@@ -62,8 +72,22 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 	@Override
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException failed) throws IOException, ServletException {
-		super.unsuccessfulAuthentication(request, response, failed);
 		// TODO: use to prevent brute force attack by for example adding counter of failed login attempts in some timerange
+		
+		String username = request.getParameter("username");
+
+		Integer failures = usersFailureAttepmts.get(username);
+		if (failures==null) {
+			failures = 1;
+			usersFailureAttepmts.put(username, failures);
+		} else {
+			failures++;
+			usersFailureAttepmts.replace(username, failures);
+		}
+		log.info("User " + username + " failed attempt " + failures);
+		
+		super.unsuccessfulAuthentication(request, response, failed);
+		
 	}
 
 	
