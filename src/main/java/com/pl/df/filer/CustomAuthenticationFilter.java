@@ -11,7 +11,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,6 +21,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pl.df.configuration.JwtUtility;
@@ -43,14 +46,27 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 		String username = request.getParameter("username");		// Json/ObjectMapper+RequestBody data can be used instead
 		String password = request.getParameter("password");
 		log.info("Username is: {}, Password is: {}.", username, password);
+		
+//		Integer failures = usersFailureAttepmts.get(username);
+//		log.info("Redeade for " + username + " failure " + failures + " attempts.");
+//		if (failures!=null && failures > 3) {
+//			log.warn("Issue with authentication of " + username + " user.");
+//			throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Username or password incorrect.");
+//		}
+		
 		UsernamePasswordAuthenticationToken authenticationToke = new UsernamePasswordAuthenticationToken(username, password);
+		Authentication authentication = authenticationManager.authenticate(authenticationToke);
+		
 		
 //		boolean isAuthenticated = authenticationToke.isAuthenticated();
 //		if (!isAuthenticated) {
+//			log.warn("Issue with authentication of " + username + " user.");
 //			throw new AuthenticationCredentialsNotFoundException("Incorrect username or password.");
 //		}
 		
-		return authenticationManager.authenticate(authenticationToke);
+		
+		return authentication;
+//		return authenticationManager.authenticate(authenticationToke);
 	}
 
 	@Override
@@ -67,6 +83,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		new ObjectMapper().writeValue(response.getOutputStream(), tokens);
 	}
+	
 	
 
 	@Override
@@ -89,7 +106,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 		super.unsuccessfulAuthentication(request, response, failed);
 		
 	}
-
 	
 	
 }
