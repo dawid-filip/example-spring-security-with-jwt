@@ -27,8 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pl.df.configuration.JwtUtility;
@@ -125,9 +123,12 @@ public class UserController {
 		if (authorizationHeader!=null && authorizationHeader.startsWith(JwtUtility.BEARER)) {	// done only once (only if success)
 			try {
 				// at this point user has been already authenticated //
-				String refresh_token = authorizationHeader.substring(BEARER.length());
-				JWTVerifier verfier = JWT.require(JwtUtility.getAlgorithm()).build();
-				DecodedJWT decodedJWT = verfier.verify(refresh_token);
+//				String refresh_token = authorizationHeader.substring(BEARER.length());
+//				JWTVerifier verfier = JWT.require(JwtUtility.getAlgorithm()).build();
+//				DecodedJWT decodedJWT = verfier.verify(refresh_token);
+				DecodedJWT decodedJWT = getDecodedJWT(authorizationHeader);
+				
+				
 				String username = decodedJWT.getSubject(); 
 				User user = userService.getUser(username);
 				
@@ -142,25 +143,9 @@ public class UserController {
 				Map<String, String> tokens = 
 						JwtUtility.getTokens(user.getUsername(), request.getRequestURI().toString(), roles);
 				
-//				String access_token = JWT.create()
-//						.withSubject(user.getUsername())	// unique identyfier for user; in this case username will be unique
-//						.withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
-//						.withIssuer(request.getRequestURI().toString())  // any string (like organization)
-//						.withClaim("roles", user.getRoles().stream()
-//												.map(Role::getName)
-//												.collect(Collectors.toList())
-//							)
-//						.sign(JwtUtility.getAlgorithm());
-				//String refresh_token = JWT.create().. // do not need, can return the same refresh token
-				
 				response.setHeader("access_token", tokens.get("access_token"));
-				response.setHeader("refresh_token", tokens.get("refresh_token")); //tokens.get("refresh_token"); OR refresh_token
+				response.setHeader("refresh_token", tokens.get("refresh_token")); 
 				
-//				Map<String, String> tokens = new HashMap<>();
-//				tokens.put("access_token", access_token);
-//				tokens.put("refresh_token", refresh_token);
-				
-				//tokens.putIfAbsent("refresh_token", refresh_token);
 				response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 				new ObjectMapper().writeValue(response.getOutputStream(), tokens);
 				
@@ -178,7 +163,6 @@ public class UserController {
 			}
 		} else {
 			throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "Refresh token is missing!");
-			//throw new RuntimeException("Refresh token is missing!");	
 		}
 		
 	}

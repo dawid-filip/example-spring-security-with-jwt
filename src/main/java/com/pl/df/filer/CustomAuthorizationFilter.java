@@ -1,5 +1,7 @@
 package com.pl.df.filer;
 
+import static com.pl.df.configuration.JwtUtility.getDecodedJWT;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,11 +21,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pl.df.configuration.JwtUtility;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -43,11 +42,12 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 			if (authorizationHeader!=null && authorizationHeader.startsWith(BEARER)) {	// done only once (only if success)
 				try {
 					// at this point user has been already authenticated //
-					String token = authorizationHeader.substring(BEARER.length());
+//					String token = authorizationHeader.substring(BEARER.length());
 					
 //					Algorithm algorithm = Algorithm.HMAC256("secret".getBytes()); // secret must be the same like during sign the token
-					JWTVerifier verfier = JWT.require(JwtUtility.getAlgorithm()).build();
-					DecodedJWT decodedJWT = verfier.verify(token);
+//					JWTVerifier verfier = JWT.require(JwtUtility.getAlgorithm()).build();
+//					DecodedJWT decodedJWT = verfier.verify(token);
+					DecodedJWT decodedJWT = getDecodedJWT(authorizationHeader);
 					
 					String username = decodedJWT.getSubject(); 
 					//String[] roles = decodedJWT.getClaim("roles").asArray(String.class);

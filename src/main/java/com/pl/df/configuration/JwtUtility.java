@@ -6,11 +6,20 @@ import java.util.List;
 import java.util.Map;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 
 public class JwtUtility {
 	
 	public static final String BEARER = "Bearer ";
+	
+	public static DecodedJWT getDecodedJWT(String authorizationHeader) {
+		String refresh_token = authorizationHeader.substring(BEARER.length());
+		JWTVerifier verfier = JWT.require(getAlgorithm()).build();  // secret must be the same like during sign the token
+		DecodedJWT decodedJWT = verfier.verify(refresh_token);
+		return decodedJWT;
+	}
 	
 	public static Algorithm getAlgorithm() {
 		Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());

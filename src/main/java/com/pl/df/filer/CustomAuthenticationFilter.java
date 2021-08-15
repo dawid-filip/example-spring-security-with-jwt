@@ -1,8 +1,6 @@
 package com.pl.df.filer;
 
 import java.io.IOException;
-import java.sql.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,8 +19,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pl.df.configuration.JwtUtility;
 
@@ -55,41 +51,11 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 				.map(GrantedAuthority::getAuthority)
 				.collect(Collectors.toList());
 		
-		Map<String, String> tokens = JwtUtility.getTokens(user.getUsername(), request.getRequestURI().toString(), roles);
+		Map<String, String> tokens = 
+				JwtUtility.getTokens(user.getUsername(), request.getRequestURI().toString(), roles);
 		
-		
-//		Algorithm algorithm = JwtUtility.getAlgorithm();
-//		Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());	// for sign json web tocket and refresh tocket; secret shuld be somewhere secured and encrypted
-		
-//		String access_token = JWT.create()
-//				.withSubject(user.getUsername())	// unique identyfier for user; in this case username will be unique
-//				.withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
-//				.withIssuer(request.getRequestURI().toString())  // any string (like organization)
-//				.withClaim("roles", user.getAuthorities().stream()
-//										.map(GrantedAuthority::getAuthority)
-//										.collect(Collectors.toList())
-//					)
-//				.sign(algorithm);
-//		
-//		
-//		String refresh_token = JWT.create()
-//				.withSubject(user.getUsername())	// unique identyfier for user; in this case username will be unique
-//				.withExpiresAt(new Date(System.currentTimeMillis() + 30 * 60 * 1000)) // more time like week, month etc.
-//				.withIssuer(request.getRequestURI().toString())  // any string (like organization)
-//				.sign(algorithm);
-		
-//		response.setHeader("access_token", access_token);
-//		response.setHeader("refresh_token", refresh_token);
-//		
-//		Map<String, String> tokens = new HashMap<>();
-//		tokens.put("access_token", access_token);
-//		tokens.put("refresh_token", refresh_token);
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		new ObjectMapper().writeValue(response.getOutputStream(), tokens);
-		
-		// OR
-		//response.getWriter().write("access_token=" + access_token + "\n");
-		//response.getWriter().write("refresh_token=" + refresh_token + "\n");
 	}
 	
 
