@@ -23,7 +23,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pl.df.JwtUtility;
+import com.pl.df.configuration.JwtUtility;
 
 import lombok.extern.log4j.Log4j2;
 

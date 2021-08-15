@@ -1,4 +1,4 @@
-package com.pl.df;
+package com.pl.df.configuration;
 
 import java.sql.Date;
 import java.util.HashMap;
@@ -9,6 +9,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 
 public class JwtUtility {
+	
+	public static final String BEARER = "Bearer ";
 	
 	public static Algorithm getAlgorithm() {
 		Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());

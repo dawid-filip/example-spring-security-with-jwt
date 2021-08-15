@@ -24,7 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pl.df.JwtUtility;
+import com.pl.df.configuration.JwtUtility;
 
 import lombok.extern.log4j.Log4j2;
 

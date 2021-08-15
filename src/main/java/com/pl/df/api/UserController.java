@@ -1,8 +1,9 @@
 package com.pl.df.api;
 
+import static com.pl.df.configuration.JwtUtility.*;
+
 import java.io.IOException;
 import java.net.URI;
-import java.sql.Date;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -12,9 +13,11 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,10 +30,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pl.df.JwtUtility;
+import com.pl.df.configuration.JwtUtility;
 import com.pl.df.dto.RoleToUserForm;
 import com.pl.df.model.Role;
 import com.pl.df.model.User;
@@ -92,14 +93,36 @@ public class UserController {
 		return ResponseEntity.ok().build();
 	}
 	
-	private final String BEARER = "Bearer ";
+	@GetMapping("/token/decode-access-token") 
+	public ResponseEntity<?> decodeAccessToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+		
+		if (authorizationHeader!=null && authorizationHeader.startsWith(BEARER)) {	// done only once (only if success)
+			String access_token = authorizationHeader.substring(BEARER.length());
+			String[] chunks = access_token.split("\\.");
+			Base64.Decoder decoder = Base64.getDecoder();
+	
+			String header = new String(decoder.decode(chunks[0]));
+			String payload = new String(decoder.decode(chunks[1]));
+
+			Map<String, String> decodedToken = new HashMap<>();
+			decodedToken.put("header", header);
+			decodedToken.put("payload", payload);
+			
+			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+			new ObjectMapper().writeValue(response.getOutputStream(), decodedToken);
+			
+		}
+		
+		return ResponseEntity.ok().build();
+	}
 	
 	// http://localhost:8088/api/token/refresh
 	@GetMapping("/token/refresh")
 	public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String authorizationHeader = request.getHeader("Authorization");
+		String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 		
-		if (authorizationHeader!=null && authorizationHeader.startsWith(BEARER)) {	// done only once (only if success)
+		if (authorizationHeader!=null && authorizationHeader.startsWith(JwtUtility.BEARER)) {	// done only once (only if success)
 			try {
 				// at this point user has been already authenticated //
 				String refresh_token = authorizationHeader.substring(BEARER.length());
@@ -108,11 +131,16 @@ public class UserController {
 				String username = decodedJWT.getSubject(); 
 				User user = userService.getUser(username);
 				
+				if (user==null) {
+					throw new UsernameNotFoundException("User " + username + " doesn't exist.");
+				}
+				
 				List<String> roles = user.getRoles().stream()
 						.map(Role::getName)
 						.collect(Collectors.toList());
 				
-				Map<String, String> tokens = JwtUtility.getTokens(user.getUsername(), request.getRequestURI().toString(), roles);
+				Map<String, String> tokens = 
+						JwtUtility.getTokens(user.getUsername(), request.getRequestURI().toString(), roles);
 				
 //				String access_token = JWT.create()
 //						.withSubject(user.getUsername())	// unique identyfier for user; in this case username will be unique
@@ -126,13 +154,13 @@ public class UserController {
 				//String refresh_token = JWT.create().. // do not need, can return the same refresh token
 				
 				response.setHeader("access_token", tokens.get("access_token"));
-				response.setHeader("refresh_token", refresh_token); //tokens.get("refresh_token");
+				response.setHeader("refresh_token", tokens.get("refresh_token")); //tokens.get("refresh_token"); OR refresh_token
 				
 //				Map<String, String> tokens = new HashMap<>();
 //				tokens.put("access_token", access_token);
 //				tokens.put("refresh_token", refresh_token);
 				
-				tokens.putIfAbsent("refresh_token", refresh_token);
+				//tokens.putIfAbsent("refresh_token", refresh_token);
 				response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 				new ObjectMapper().writeValue(response.getOutputStream(), tokens);
 				

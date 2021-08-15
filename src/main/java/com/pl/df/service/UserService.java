@@ -12,6 +12,6 @@ public interface UserService {
 	User getUser(String username);
 	List<User> getUsers();									// usually only for tests, no prod case
 	
-	User getUserById(long id);			// additional method
-	Role getRoleById(long id); 	// additional method
+	User getUserById(long id);								// additional method
+	Role getRoleById(long id); 								// additional method
 }

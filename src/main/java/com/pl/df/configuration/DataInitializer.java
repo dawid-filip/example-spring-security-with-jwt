@@ -1,4 +1,4 @@
-package com.pl.df;
+package com.pl.df.configuration;
 
 import java.util.ArrayList;
 
@@ -12,6 +12,8 @@ import com.pl.df.service.UserService;
 
 import lombok.extern.log4j.Log4j2;
 
+import static com.pl.df.configuration.AppRole.*;
+
 @Configuration
 @Log4j2
 public class DataInitializer implements CommandLineRunner {
@@ -22,11 +24,11 @@ public class DataInitializer implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		log.info("Adding roles..");
-		userService.saveRole(new Role(1L, "ROLE_SUPER_ADMIN"));
-		userService.saveRole(new Role(2L, "ROLE_ADMIN"));
-		userService.saveRole(new Role(3L, "ROLE_MANAGER"));
-		userService.saveRole(new Role(4L, "ROLE_EDITOR"));
-		userService.saveRole(new Role(5L, "ROLE_USER"));
+		userService.saveRole(new Role(1L, SUPER_ADMIN.toString()));
+		userService.saveRole(new Role(2L, ADMIN.toString()));
+		userService.saveRole(new Role(3L, MANAGER.toString()));
+		userService.saveRole(new Role(4L, EDITOR.toString()));
+		userService.saveRole(new Role(5L, USER.toString()));
 		log.info("Roles added.");
 
 		log.info("Adding users..");
@@ -37,26 +39,18 @@ public class DataInitializer implements CommandLineRunner {
 		log.info("Users added.");
 		
 		log.info("Adding roles to users..");
-		userService.addRoleToUser("tom", "ROLE_SUPER_ADMIN");
-		userService.addRoleToUser("tom", "ROLE_ADMIN");
-		userService.addRoleToUser("tom", "ROLE_USER");
-		userService.addRoleToUser("jery", "ROLE_ADMIN");
-		userService.addRoleToUser("johan", "ROLE_MANAGER");
-		userService.addRoleToUser("george", "ROLE_MANAGER");
-		userService.addRoleToUser("george", "ROLE_USER");
+		userService.addRoleToUser("tom", SUPER_ADMIN.toString());
+		userService.addRoleToUser("tom", ADMIN.toString());
+		userService.addRoleToUser("tom", USER.toString());
+		userService.addRoleToUser("jery", ADMIN.toString());
+		userService.addRoleToUser("johan", MANAGER.toString());
+		userService.addRoleToUser("george", MANAGER.toString());
+		userService.addRoleToUser("george", USER.toString());
 		log.info("Added roles to users.");
 		
-		log.info("Users in DB are:");
-		userService.getUsers().forEach(user -> log.info(user.toString()));
+		StringBuilder sb = new StringBuilder("Users in DB are:\n");
+		userService.getUsers().forEach(user -> sb.append(user.toString() + "\n"));
+		log.info(sb.toString());
 	}
 	
 }
-
-
-
-
-
-
-
-
-

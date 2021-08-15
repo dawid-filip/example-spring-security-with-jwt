@@ -13,10 +13,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.pl.df.configuration.AppRole;
 import com.pl.df.filer.CustomAuthenticationFilter;
 import com.pl.df.filer.CustomAuthorizationFilter;
 
 import lombok.RequiredArgsConstructor;
+
+import static com.pl.df.configuration.AppRole.*;
 
 @Configuration
 @EnableWebSecurity
@@ -42,8 +45,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/token/refresh/**").permitAll(); // also added in Filter
 		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/login/**").permitAll();
 		//http.authorizeRequests().antMatchers(HttpMethod.GET, "/login").permitAll(); // not secured; must be placed before more restricted; this is already handling by spring
-		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority("ROLE_USER");
-		http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/users/**").hasAnyAuthority("ROLE_ADMIN");
+		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority(USER.toString());
+		http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/users/**").hasAnyAuthority(ADMIN.toString());
 		http.authorizeRequests().anyRequest().authenticated(); ///.permitAll();
 		
 		http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class); // must be before because it must be executed before each request
