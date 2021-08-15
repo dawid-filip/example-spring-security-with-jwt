@@ -93,17 +93,17 @@ public class UserController {
 	
 	@GetMapping("/token/decode-access-token") 
 	public ResponseEntity<?> decodeAccessToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+		var authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 		
 		if (authorizationHeader!=null && authorizationHeader.startsWith(BEARER)) {	// done only once (only if success)
-			String access_token = authorizationHeader.substring(BEARER.length());
-			String[] chunks = access_token.split("\\.");
+			var access_token = authorizationHeader.substring(BEARER.length());
+			var chunks = access_token.split("\\.");
 			Base64.Decoder decoder = Base64.getDecoder();
 	
-			String header = new String(decoder.decode(chunks[0]));
-			String payload = new String(decoder.decode(chunks[1]));
+			var header = new String(decoder.decode(chunks[0]));
+			var payload = new String(decoder.decode(chunks[1]));
 
-			Map<String, String> decodedToken = new HashMap<>();
+			var decodedToken = new HashMap<>();
 			decodedToken.put("header", header);
 			decodedToken.put("payload", payload);
 			
