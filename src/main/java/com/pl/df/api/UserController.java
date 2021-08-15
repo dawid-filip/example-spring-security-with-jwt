@@ -138,8 +138,8 @@ public class UserController {
 				Map<String, String> tokens = 
 						JwtUtility.getTokens(user.getUsername(), request.getRequestURI().toString(), roles);
 				
-				response.setHeader("access_token", tokens.get("access_token"));
-				response.setHeader("refresh_token", tokens.get("refresh_token")); 
+				response.setHeader(ACCESS_TOKEN, tokens.get(ACCESS_TOKEN));
+				response.setHeader(REFRESH_TOKEN, tokens.get(REFRESH_TOKEN)); 
 				
 				response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 				new ObjectMapper().writeValue(response.getOutputStream(), tokens);
@@ -152,7 +152,7 @@ public class UserController {
 				//response.sendError(403); // Forbidden
 				
 				Map<String, String> errors = new HashMap<>();
-				errors.put("error_message", errorMessage);
+				errors.put(ERROR_MESSAGE, errorMessage);
 				response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 				new ObjectMapper().writeValue(response.getOutputStream(), errors);
 			}

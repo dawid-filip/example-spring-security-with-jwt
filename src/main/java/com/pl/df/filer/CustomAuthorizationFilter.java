@@ -15,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,6 +24,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pl.df.configuration.JwtUtility;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -38,7 +40,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 			log.info("/api/login doFilter(request, response)...");
 			filterChain.doFilter(request, response);
 		} else {
-			String authorizationHeader = request.getHeader("Authorization");
+			String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 			if (authorizationHeader!=null && authorizationHeader.startsWith(BEARER)) {	// done only once (only if success)
 				try {
 					// at this point user has been already authenticated //
@@ -63,7 +65,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 					//response.sendError(403); // Forbidden
 					
 					Map<String, String> errors = new HashMap<>();
-					errors.put("error_message", errorMessage);
+					errors.put(JwtUtility.ERROR_MESSAGE, errorMessage);
 					response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 					new ObjectMapper().writeValue(response.getOutputStream(), errors);
 				}

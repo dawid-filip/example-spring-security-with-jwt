@@ -14,6 +14,10 @@ public class JwtUtility {
 	
 	public static final String BEARER = "Bearer ";
 	
+	public static final String ACCESS_TOKEN = "access_token";
+	public static final String REFRESH_TOKEN = "refresh_token";
+	public static final String ERROR_MESSAGE = "error_message";
+	
 	public static DecodedJWT getDecodedJWT(String authorizationHeader) {
 		String refresh_token = authorizationHeader.substring(BEARER.length());
 		JWTVerifier verfier = JWT.require(getAlgorithm()).build();  // secret must be the same like during sign the token
@@ -41,8 +45,8 @@ public class JwtUtility {
 				.sign(getAlgorithm());
 		
 		Map<String, String> tokens = new HashMap<>();
-		tokens.put("access_token", access_token);
-		tokens.put("refresh_token", refresh_token);
+		tokens.put(ACCESS_TOKEN, access_token);
+		tokens.put(REFRESH_TOKEN, refresh_token);
 		
 		return tokens;
 	}
