@@ -109,7 +109,6 @@ public class UserController {
 			
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 			new ObjectMapper().writeValue(response.getOutputStream(), decodedToken);
-			
 		}
 		
 		return ResponseEntity.ok().build();
@@ -123,11 +122,7 @@ public class UserController {
 		if (authorizationHeader!=null && authorizationHeader.startsWith(JwtUtility.BEARER)) {	// done only once (only if success)
 			try {
 				// at this point user has been already authenticated //
-//				String refresh_token = authorizationHeader.substring(BEARER.length());
-//				JWTVerifier verfier = JWT.require(JwtUtility.getAlgorithm()).build();
-//				DecodedJWT decodedJWT = verfier.verify(refresh_token);
 				DecodedJWT decodedJWT = getDecodedJWT(authorizationHeader);
-				
 				
 				String username = decodedJWT.getSubject(); 
 				User user = userService.getUser(username);

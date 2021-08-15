@@ -42,22 +42,13 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 			if (authorizationHeader!=null && authorizationHeader.startsWith(BEARER)) {	// done only once (only if success)
 				try {
 					// at this point user has been already authenticated //
-//					String token = authorizationHeader.substring(BEARER.length());
-					
-//					Algorithm algorithm = Algorithm.HMAC256("secret".getBytes()); // secret must be the same like during sign the token
-//					JWTVerifier verfier = JWT.require(JwtUtility.getAlgorithm()).build();
-//					DecodedJWT decodedJWT = verfier.verify(token);
 					DecodedJWT decodedJWT = getDecodedJWT(authorizationHeader);
 					
 					String username = decodedJWT.getSubject(); 
-					//String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
 					List<String> roles = Arrays.asList(decodedJWT.getClaim("roles").asArray(String.class));
 					
 					Collection<SimpleGrantedAuthority> authorities =
 							roles.stream().map(role -> new SimpleGrantedAuthority(role)).collect(Collectors.toList());
-//					Arrays.stream(roles).forEach(role -> {
-//						authorities.add(new SimpleGrantedAuthority(role));
-//					});
 					
 					UsernamePasswordAuthenticationToken authenticationToken = 
 							new UsernamePasswordAuthenticationToken(username, null, authorities);
