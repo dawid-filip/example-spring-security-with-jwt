@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -61,9 +62,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 		user.setPassword(passwordEncoder.encode(user.getPassword())); // encoding password before saving into database 
 		
-		return userRepo.save(user);
+		User users = userRepo.findByUsername(user.getUsername());
+		if (users==null) {
+			return userRepo.save(user);
+		}
+		
+		throw new DuplicateKeyException("User " + user.getUsername() + " already exist.");
 	}
-
+	
 	@Override
 	public Role saveRole(Role role) {
 		log.info("saveRole: " + role.getName());

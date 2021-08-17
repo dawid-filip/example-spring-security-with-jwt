@@ -43,7 +43,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
  		
 		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/token/refresh/**").permitAll(); // also added in Filter
-		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/login/**").permitAll();
+		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/login/**", "/api/logout/**").permitAll();
+		http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/registration/**").permitAll();
 		//http.authorizeRequests().antMatchers(HttpMethod.GET, "/login").permitAll(); // not secured; must be placed before more restricted; this is already handling by spring
 		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority(USER.toString());
 		http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/users/**").hasAnyAuthority(ADMIN.toString());

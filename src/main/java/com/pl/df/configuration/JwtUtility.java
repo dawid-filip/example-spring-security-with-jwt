@@ -25,11 +25,6 @@ public class JwtUtility {
 		return decodedJWT;
 	}
 	
-	public static Algorithm getAlgorithm() {
-		Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
-		return algorithm;
-	}
-	
 	public static Map<String, String> getTokens(String subject, String issuer, List<?> roles) {
 		String access_token = JWT.create()
 				.withSubject(subject)				// unique identyfier for user; in this case username will be unique
@@ -50,5 +45,9 @@ public class JwtUtility {
 		
 		return tokens;
 	}
-	
+
+	public static Algorithm getAlgorithm() {
+		Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
+		return algorithm;
+	}
 }

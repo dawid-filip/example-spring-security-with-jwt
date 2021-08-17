@@ -1,10 +1,13 @@
 package com.pl.df.api;
 
+import static com.pl.df.configuration.AppRole.USER;
 import static com.pl.df.configuration.JwtUtility.*;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +34,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pl.df.configuration.JwtUtility;
 import com.pl.df.dto.RoleToUserForm;
+import com.pl.df.dto.UserForm;
 import com.pl.df.model.Role;
 import com.pl.df.model.User;
 import com.pl.df.repository.RoleRepo;
@@ -72,7 +76,7 @@ public class UserController {
 	
 	// http://localhost:8088/api/users
 	@PostMapping("/users")
-	public ResponseEntity<User> saveUser(@RequestBody User user) {
+	public ResponseEntity<?> saveUser(@RequestBody User user) {
 		User savedUser = userService.saveUser(user);
 		return ResponseEntity.created(createURI("/api/users/" + savedUser.getId())).body(savedUser);
 	}
@@ -88,6 +92,17 @@ public class UserController {
 	@PostMapping("/role/add-to-user")
 	public ResponseEntity<Void> addRoleToUser(@RequestBody RoleToUserForm roleToUserForm) {
 		userService.addRoleToUser(roleToUserForm.getUsername(), roleToUserForm.getRolename());
+		return ResponseEntity.ok().build();
+	}
+	
+	@PostMapping("/registration")
+	public ResponseEntity<?> registrateUser(@RequestBody UserForm userForm) {
+		Collection<Role> roles = new ArrayList<>();
+		roles.add(new Role(5L, USER.toString()));
+		User user = new User(null, userForm.getName(), userForm.getUsername(), userForm.getPassword(), roles);
+		
+		userService.saveUser(user);
+		
 		return ResponseEntity.ok().build();
 	}
 	
