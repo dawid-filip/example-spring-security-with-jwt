@@ -1,7 +1,6 @@
 package com.pl.df.filer;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,6 +27,8 @@ import com.pl.df.dto.UserLoginForm;
 
 import lombok.extern.log4j.Log4j2;
 
+import static com.pl.df.configuration.JwtUtility.setHttpErrorResponse;
+
 @Log4j2
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	
@@ -52,22 +53,8 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 			
 			return authentication;
 		} catch (IOException e) {
-			final String errorMessage = "Incorrect body request";
-			log.error(errorMessage);
-			
-			userLoginForm = new UserLoginForm(HttpStatus.UNAUTHORIZED.name(), "");
-			
-			response.setStatus(400, errorMessage);
-
-			Map<String, String> errors = new HashMap<>();
-			errors.put(JwtUtility.ERROR_MESSAGE, errorMessage);
-			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-			try {
-				new ObjectMapper().writeValue(response.getOutputStream(), errors);
-			} catch (IOException ie) {
-				log.error("IOException: " + ie.getMessage());
-			}
-			
+			log.error(e.getMessage());
+			setHttpErrorResponse(HttpStatus.BAD_REQUEST.value(), "Incorrect body request", response);
 		}
 		
 		return null; 
@@ -94,20 +81,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authExcetpion) throws IOException, ServletException {
 		// TODO: use to prevent brute force attack by for example adding counter of failed login attempts in some timerange
-		
-		final String errorMessage = "Authentication failed: " + authExcetpion.getMessage(); 
-		log.error(errorMessage);
-
-		response.setStatus(401);
-		Map<String, String> errors = new HashMap<>();
-		errors.put(JwtUtility.ERROR_MESSAGE, errorMessage);
-		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-		try {
-			new ObjectMapper().writeValue(response.getOutputStream(), errors);
-		} catch (IOException ie) {
-			log.error("IOException: " + ie.getMessage());
-		}
-		
+		setHttpErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Authentication failed: " + authExcetpion.getMessage(), response);
 	}
 	
 }

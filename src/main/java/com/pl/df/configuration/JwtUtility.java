@@ -1,15 +1,24 @@
 package com.pl.df.configuration;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.http.MediaType;
+
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 public class JwtUtility {
 	
 	public static final String BEARER = "Bearer ";
@@ -47,7 +56,25 @@ public class JwtUtility {
 	}
 
 	public static Algorithm getAlgorithm() {
-		Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
-		return algorithm;
+		return Algorithm.HMAC256("secret".getBytes()); // TODO: the secret should be kept secured way
+	}
+	
+	public static void setHttpErrorResponse(int code, String errorMessage, HttpServletResponse response) {
+		log.error(errorMessage);
+		
+		response.setHeader("error", errorMessage);
+		response.setStatus(code);
+//		response.sendError(code);
+		
+		Map<String, String> errors = new HashMap<>();
+		errors.put(ERROR_MESSAGE, errorMessage);
+		
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+		try {
+			new ObjectMapper().writeValue(response.getOutputStream(), errors);
+		} catch (IOException ie) {
+			log.error("IOException: " + ie.getMessage());
+		}
+		
 	}
 }
