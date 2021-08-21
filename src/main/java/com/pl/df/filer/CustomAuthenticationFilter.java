@@ -94,8 +94,20 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authExcetpion) throws IOException, ServletException {
 		// TODO: use to prevent brute force attack by for example adding counter of failed login attempts in some timerange
-		super.unsuccessfulAuthentication(request, response, authExcetpion);
+		
+		final String errorMessage = "Authentication failed: " + authExcetpion.getMessage(); 
+		log.error(errorMessage);
+
+		response.setStatus(401);
+		Map<String, String> errors = new HashMap<>();
+		errors.put(JwtUtility.ERROR_MESSAGE, errorMessage);
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+		try {
+			new ObjectMapper().writeValue(response.getOutputStream(), errors);
+		} catch (IOException ie) {
+			log.error("IOException: " + ie.getMessage());
+		}
+		
 	}
-	
 	
 }
