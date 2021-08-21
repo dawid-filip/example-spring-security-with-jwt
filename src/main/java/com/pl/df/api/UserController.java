@@ -95,6 +95,7 @@ public class UserController {
 		return ResponseEntity.ok().build();
 	}
 	
+	// http://localhost:8088/api/registration
 	@PostMapping("/registration")
 	public ResponseEntity<?> registrateUser(@RequestBody UserForm userForm) {
 		Collection<Role> roles = new ArrayList<>();
@@ -106,6 +107,7 @@ public class UserController {
 		return ResponseEntity.ok().build();
 	}
 	
+	// http://localhost:8088/api/token/decode-access-token
 	@GetMapping("/token/decode-access-token") 
 	public ResponseEntity<?> decodeAccessToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		var authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
