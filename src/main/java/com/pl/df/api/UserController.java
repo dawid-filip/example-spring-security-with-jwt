@@ -43,6 +43,8 @@ import com.pl.df.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+import static com.pl.df.configuration.JwtUtility.setHttpErrorResponse;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -162,16 +164,7 @@ public class UserController {
 				new ObjectMapper().writeValue(response.getOutputStream(), tokens);
 				
 			} catch (Exception e) {
-				String errorMessage = "Error login into application: " + e.getMessage();
-				log.error(errorMessage);
-				response.setHeader("error", errorMessage);
-				response.setStatus(403); // Forbidden
-				//response.sendError(403); // Forbidden
-				
-				Map<String, String> errors = new HashMap<>();
-				errors.put(ERROR_MESSAGE, errorMessage);
-				response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-				new ObjectMapper().writeValue(response.getOutputStream(), errors);
+				setHttpErrorResponse(403, "Error login into application: " + e.getMessage(), response);
 			}
 		} else {
 			throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "Refresh token is missing!");
