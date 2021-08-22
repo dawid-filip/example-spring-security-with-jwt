@@ -6,6 +6,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -13,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.pl.df.configuration.AppRole;
 import com.pl.df.filer.CustomAuthenticationFilter;
 import com.pl.df.filer.CustomAuthorizationFilter;
 
@@ -49,9 +49,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority(USER.toString());
 		http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/users/**").hasAnyAuthority(ADMIN.toString());
 		http.authorizeRequests().anyRequest().authenticated(); ///.permitAll();
-		
+
 		http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class); // must be before because it must be executed before each request
 		http.addFilter(customAuthenticationFilter);
+	}
+	
+	@Override
+	public void configure(WebSecurity web) throws Exception {
+		final String[] whiteList = {
+				"/swagger-ui/**",
+				"/swagger-resources/**",
+				"/v2/api-docs/**"};
+	    web.ignoring().antMatchers(whiteList);
 	}
 	
 	@Bean
