@@ -59,6 +59,12 @@ public class JwtUtility {
 		return Algorithm.HMAC256("secret".getBytes()); // TODO: the secret should be kept secured way
 	}
 	
+	public static void setTokensToResponseBodyAndHeaders(Map<String, String> tokens, HttpServletResponse response) {
+		response.setHeader(ACCESS_TOKEN, tokens.get(ACCESS_TOKEN));
+		response.setHeader(REFRESH_TOKEN, tokens.get(REFRESH_TOKEN)); 
+		setResponseBody(tokens, response);
+	}
+	
 	public static void setHttpErrorResponse(int code, String errorMessage, HttpServletResponse response) {
 		log.error(errorMessage);
 		
@@ -69,12 +75,17 @@ public class JwtUtility {
 		Map<String, String> errors = new HashMap<>();
 		errors.put(ERROR_MESSAGE, errorMessage);
 		
+		setResponseBody(errors, response);
+	}
+	
+	private static void setResponseBody(Map<String, String> responseBody, HttpServletResponse response) {
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+	
 		try {
-			new ObjectMapper().writeValue(response.getOutputStream(), errors);
+			new ObjectMapper().writeValue(response.getOutputStream(), responseBody);
 		} catch (IOException ie) {
 			log.error("IOException: " + ie.getMessage());
 		}
-		
 	}
+	
 }

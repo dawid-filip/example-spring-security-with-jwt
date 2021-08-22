@@ -32,7 +32,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pl.df.configuration.JwtUtility;
 import com.pl.df.dto.RoleToUserForm;
 import com.pl.df.dto.UserForm;
 import com.pl.df.model.Role;
@@ -42,8 +41,6 @@ import com.pl.df.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-
-import static com.pl.df.configuration.JwtUtility.setHttpErrorResponse;
 
 @RestController
 @RequestMapping("/api")
@@ -138,7 +135,7 @@ public class UserController {
 	public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 		
-		if (authorizationHeader!=null && authorizationHeader.startsWith(JwtUtility.BEARER)) {	// done only once (only if success)
+		if (authorizationHeader!=null && authorizationHeader.startsWith(BEARER)) {	// done only once (only if success)
 			try {
 				// at this point user has been already authenticated //
 				DecodedJWT decodedJWT = getDecodedJWT(authorizationHeader);
@@ -154,14 +151,9 @@ public class UserController {
 						.map(Role::getName)
 						.collect(Collectors.toList());
 				
-				Map<String, String> tokens = 
-						JwtUtility.getTokens(user.getUsername(), request.getRequestURI().toString(), roles);
+				Map<String, String> tokens = getTokens(user.getUsername(), request.getRequestURI().toString(), roles);
 				
-				response.setHeader(ACCESS_TOKEN, tokens.get(ACCESS_TOKEN));
-				response.setHeader(REFRESH_TOKEN, tokens.get(REFRESH_TOKEN)); 
-				
-				response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-				new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+				setTokensToResponseBodyAndHeaders(tokens, response);
 				
 			} catch (Exception e) {
 				setHttpErrorResponse(403, "Error login into application: " + e.getMessage(), response);

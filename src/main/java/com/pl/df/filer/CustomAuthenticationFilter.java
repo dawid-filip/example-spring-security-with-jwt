@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,12 +21,11 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pl.df.configuration.JwtUtility;
 import com.pl.df.dto.UserLoginForm;
 
 import lombok.extern.log4j.Log4j2;
 
-import static com.pl.df.configuration.JwtUtility.setHttpErrorResponse;
+import static com.pl.df.configuration.JwtUtility.*;
 
 @Log4j2
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -68,15 +66,12 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 				.map(GrantedAuthority::getAuthority)
 				.collect(Collectors.toList());
 		
-		Map<String, String> tokens = 
-				JwtUtility.getTokens(user.getUsername(), request.getRequestURI().toString(), roles);
+		Map<String, String> tokens = getTokens(user.getUsername(), request.getRequestURI().toString(), roles);
 		
-		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-		new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+		setTokensToResponseBodyAndHeaders(tokens, response);
+		
 	}
 	
-	
-
 	@Override
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authExcetpion) throws IOException, ServletException {

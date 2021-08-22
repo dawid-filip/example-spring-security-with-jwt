@@ -24,20 +24,16 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.extern.log4j.Log4j2;
 
 import static com.pl.df.configuration.JwtUtility.setHttpErrorResponse;
+import static com.pl.df.configuration.JwtUtility.BEARER;
 
 @Log4j2
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
-	private final String BEARER = "Bearer ";
-	
 	// intercept every request which goes into application
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-		if (request.getServletPath().equals("/api/login") || 
-				request.getServletPath().equals("/api/registration") ||
-				request.getServletPath().equals("/api/logout") ||  
-				request.getServletPath().equals("/api/token/refresh")) {
-			log.info("/api/login doFilter(request, response)...");
+		if (isAllowedPath(request)) {
+			log.info(request.getServletPath() + " doFilter(request, response)...");
 			filterChain.doFilter(request, response);
 		} else {
 			String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -64,6 +60,13 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 				filterChain.doFilter(request, response);
 			}
 		}
+	}
+	
+	private boolean isAllowedPath(HttpServletRequest request) {
+		return request.getServletPath().equals("/api/login") || 
+				request.getServletPath().equals("/api/token/refresh") ||
+				request.getServletPath().equals("/api/registration") ||
+				request.getServletPath().equals("/api/logout");
 	}
 
 }
