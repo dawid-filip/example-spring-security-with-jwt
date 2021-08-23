@@ -6,7 +6,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -42,6 +41,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.csrf().disable();
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
  		
+		http.authorizeRequests()
+				.antMatchers(HttpMethod.GET, "/swagger-ui/**", "/swagger-resources/**", "/v2/api-docs/**")
+				.permitAll();
 		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/token/refresh/**").permitAll(); // also added in Filter
 		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/login/**", "/api/logout/**").permitAll();
 		http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/registration/**").permitAll();
@@ -54,14 +56,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.addFilter(customAuthenticationFilter);
 	}
 	
-	@Override
-	public void configure(WebSecurity web) throws Exception {
-		final String[] whiteList = {
-				"/swagger-ui/**",
-				"/swagger-resources/**",
-				"/v2/api-docs/**"};
-	    web.ignoring().antMatchers(whiteList);
-	}
+	// Can be used alternatively for swagger: //
+//	@Override
+//	public void configure(WebSecurity web) throws Exception {
+//		final String[] swaggerWhiteList = {
+//				"/swagger-ui/**",
+//				"/swagger-resources/**",
+//				"/v2/api-docs/**"};
+//	    web.ignoring().antMatchers(swaggerWhiteList);
+//	}
 	
 	@Bean
 	@Override
