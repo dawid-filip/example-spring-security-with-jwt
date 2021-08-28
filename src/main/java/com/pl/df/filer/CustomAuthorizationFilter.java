@@ -64,8 +64,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 	
 	private boolean isAllowedPath(HttpServletRequest request) {
 		return request.getServletPath().equals("/api/login") || 
-				request.getServletPath().equals("/api/token/refresh") ||
-				request.getServletPath().equals("/api/registration") ||
+				request.getServletPath().equals("/api/tokens/refresh") ||
+				request.getServletPath().equals("/api/users/registration") ||
 				request.getServletPath().equals("/api/logout") ||
 				
 				// for swagger:

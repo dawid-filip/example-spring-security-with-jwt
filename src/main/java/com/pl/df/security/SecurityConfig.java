@@ -44,12 +44,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests()
 				.antMatchers(HttpMethod.GET, "/swagger-ui/**", "/swagger-resources/**", "/v2/api-docs/**")
 				.permitAll();
-		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/token/refresh/**").permitAll(); // also added in Filter
+		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/tokens/refresh/**").permitAll(); // also added in Filter
 		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/login/**", "/api/logout/**").permitAll();
-		http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/registration/**").permitAll();
+		http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/users/registration/**").permitAll();
 		//http.authorizeRequests().antMatchers(HttpMethod.GET, "/login").permitAll(); // not secured; must be placed before more restricted; this is already handling by spring
 		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority(USER.toString());
 		http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/users/**").hasAnyAuthority(ADMIN.toString());
+		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/roles/**").hasAnyAuthority(USER.toString());
+		http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/roles/**").hasAnyAuthority(ADMIN.toString());
 		http.authorizeRequests().anyRequest().authenticated(); ///.permitAll();
 
 		http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class); // must be before because it must be executed before each request
