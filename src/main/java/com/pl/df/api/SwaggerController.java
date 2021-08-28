@@ -14,10 +14,16 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class SwaggerController {
 	
-	// http://localhost:8088/api/swagger-ui/index.html
+	// http://localhost:8088/api/swagger
 	@GetMapping
-	public RedirectView swaggerRedirect() {
+	public RedirectView swaggerUiRedirect() {
 		return new RedirectView("/api/swagger-ui/index.html");
+	}
+
+	// http://localhost:8088/api/swagger/api
+	@GetMapping("/api")
+	public RedirectView swaggerApiRedirect() {
+		return new RedirectView("/v2/api-docs");
 	}
 	
 }

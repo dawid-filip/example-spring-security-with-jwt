@@ -19,7 +19,7 @@ public class SwaggerConfig {
 	// http://localhost:8088/v2/api-docs
 	
 	@Bean
-	public Docket get() {
+	public Docket getDocket() {
 		return new Docket(DocumentationType.SWAGGER_2)
 				.enable(true)
 				.select()
@@ -35,7 +35,9 @@ public class SwaggerConfig {
 				"Example JWT REST API description", 
 				"REST API v2", 
 				"Terms of service",
-				new Contact("Tom T.", "www.tom-tom-t.com", "tomt@com"), "License of API", "API license URL",
+				new Contact("DF.", "www.df.com", "df@df.pl"), 
+				"License of API", 
+				"API license URL",
 				Collections.emptyList());
 	}
 	
