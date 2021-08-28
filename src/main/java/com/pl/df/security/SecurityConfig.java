@@ -2,7 +2,6 @@ package com.pl.df.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,6 +18,7 @@ import com.pl.df.filer.CustomAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
 
 import static com.pl.df.configuration.AppRole.*;
+import static org.springframework.http.HttpMethod.*;
 
 @Configuration
 @EnableWebSecurity
@@ -41,17 +41,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.csrf().disable();
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
  		
-		http.authorizeRequests()
-				.antMatchers(HttpMethod.GET, "/swagger-ui/**", "/swagger-resources/**", "/v2/api-docs/**")
-				.permitAll();
-		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/tokens/refresh/**").permitAll(); // also added in Filter
-		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/login/**", "/api/logout/**").permitAll();
-		http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/users/registration/**").permitAll();
+		http.authorizeRequests().antMatchers(GET, "/api/swagger/**", 
+				"/api/swagger-ui/**", "/api/swagger-resources/**", 
+				"/api/swagger-ui/**", "/v2/api-docs/**").permitAll();
+		http.authorizeRequests().antMatchers(GET, "/api/tokens/refresh/**").permitAll(); // also added in Filter
+		http.authorizeRequests().antMatchers(GET, "/api/login/**", "/api/logout/**").permitAll();
+		http.authorizeRequests().antMatchers(POST, "/api/users/registration/**").permitAll();
 		//http.authorizeRequests().antMatchers(HttpMethod.GET, "/login").permitAll(); // not secured; must be placed before more restricted; this is already handling by spring
-		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority(USER.toString());
-		http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/users/**").hasAnyAuthority(ADMIN.toString());
-		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/roles/**").hasAnyAuthority(USER.toString());
-		http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/roles/**").hasAnyAuthority(ADMIN.toString());
+		http.authorizeRequests().antMatchers(GET, "/api/users/**").hasAnyAuthority(USER.toString());
+		http.authorizeRequests().antMatchers(POST, "/api/users/**").hasAnyAuthority(ADMIN.toString());
+		http.authorizeRequests().antMatchers(GET, "/api/roles/**").hasAnyAuthority(USER.toString());
+		http.authorizeRequests().antMatchers(POST, "/api/roles/**").hasAnyAuthority(ADMIN.toString());
 		http.authorizeRequests().anyRequest().authenticated(); ///.permitAll();
 
 		http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class); // must be before because it must be executed before each request

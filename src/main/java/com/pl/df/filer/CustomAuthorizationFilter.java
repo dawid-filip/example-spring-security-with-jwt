@@ -69,8 +69,9 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 				request.getServletPath().equals("/api/logout") ||
 				
 				// for swagger:
-				request.getServletPath().equals("/swagger-ui") ||
-				request.getServletPath().equals("/swagger-resources") ||
+				request.getServletPath().equals("/api/swagger") ||
+				request.getServletPath().equals("/api/swagger-ui") ||
+				request.getServletPath().equals("/api/swagger-resources") ||
 				request.getServletPath().equals("/v2/api-docs");
 	}
 	

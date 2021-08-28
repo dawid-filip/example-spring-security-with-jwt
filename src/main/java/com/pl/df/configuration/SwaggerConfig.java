@@ -23,8 +23,7 @@ public class SwaggerConfig {
 		return new Docket(DocumentationType.SWAGGER_2)
 				.enable(true)
 				.select()
-				//.paths(PathSelectors.any())
-				.paths(PathSelectors.ant("/api/**"))
+				.paths(PathSelectors.ant("/api/**"))			// add all doc APIs to swagger located at /api/**
 				.apis(RequestHandlerSelectors.basePackage("com.pl.df.api"))
 				.build()
 				.apiInfo(apiInfo());
@@ -32,9 +31,9 @@ public class SwaggerConfig {
 
 	private ApiInfo apiInfo() {
 		return new ApiInfo(
-				"REST API documentation", 
-				"REST API description.", 
-				"API TOS", 
+				"Example JWT REST API documentation", 
+				"Example JWT REST API description", 
+				"REST API v2", 
 				"Terms of service",
 				new Contact("Tom T.", "www.tom-tom-t.com", "tomt@com"), "License of API", "API license URL",
 				Collections.emptyList());
